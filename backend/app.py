@@ -4,7 +4,7 @@ Build a few jobs, register them, run them, print a summary.
 """
 
 
-from models import EmailJob, DataProcessingJob, PriorityJob
+from models import JobFactory, PriorityJob
 
 from task_manager import TaskManager
 
@@ -13,12 +13,12 @@ from executor import Executor
 
 def build_jobs():
     jobs = [
-        EmailJob(1, "user@example.com"),
-        DataProcessingJob(2, "dataset_A"),
-        PriorityJob(3, "Critical security alert", 10),
-        EmailJob(4, "admin@example.com"),
-        DataProcessingJob(5, "dataset_B"),
-        PriorityJob(6, "Urgent system backup", 8),
+        JobFactory.create_job("email", 1, recipient="user@example.com"),
+        JobFactory.create_job("data", 2, dataset="dataset_A"),
+        JobFactory.create_job("priority", 3, description="Critical security alert", priority=10),
+        JobFactory.create_job("email", 4, recipient="admin@example.com"),
+        JobFactory.create_job("data", 5, dataset="dataset_B"),
+        JobFactory.create_job("priority", 6, description="Urgent system backup", priority=8),
     ]
 
     priority_jobs = [job for job in jobs if isinstance(job, PriorityJob)]
