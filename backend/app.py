@@ -19,6 +19,7 @@ def build_jobs():
         JobFactory.create_job("email", 4, recipient="admin@example.com"),
         JobFactory.create_job("data", 5, dataset="dataset_B"),
         JobFactory.create_job("priority", 6, description="Urgent system backup", priority=8),
+        JobFactory.create_job("retryable", 4, description="Sync distributed nodes", retries=3),
     ]
 
     priority_jobs = [job for job in jobs if isinstance(job, PriorityJob)]

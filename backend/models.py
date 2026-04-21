@@ -129,4 +129,23 @@ class JobFactory:
             return DataProcessingJob(job_id, kwargs["dataset"])
         if job_type == "priority":
             return PriorityJob(job_id, kwargs["description"], kwargs["priority"])
+        if job_type == "retryable":
+            return RetryableJob(job_id, kwargs["description"], kwargs.get("retries", 3))
         raise ValueError(f"Unknown job type: {job_type}")
+    
+class RetryableJob(Job):
+    def __init__(self, job_id: int, description: str, retries: int = 3) -> None:
+        super().__init__(job_id, description)
+        self.retries = retries
+
+    def execute(self) -> None:
+        self.start()
+        self.add_log(f"Retryable job {self.job_id} execution started")
+
+    def finish_success(self, attempt: int) -> None:
+        self.add_log(f"Retryable job {self.job_id} succeeded on attempt {attempt}")
+        self.end()
+
+    def finish_failure(self) -> None:
+        self.add_log(f"Retryable job {self.job_id} failed after {self.retries} attempts")
+        self.end()
