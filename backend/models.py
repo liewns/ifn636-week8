@@ -77,3 +77,13 @@ class DataProcessingJob(Job):
         print(f"Processing dataset {self.dataset}...")
 
         # FIX (models.py): removed self.mark_done() here — same reason as EmailJob above.
+
+class PriorityJob(Job):
+    """Child class: high-priority job."""
+
+    def __init__(self, job_id: int, description: str, priority: int) -> None:
+        super().__init__(job_id, description)
+        self.priority = priority
+
+    def execute(self) -> None:
+        print(f"Executing priority job: {self.description} (priority={self.priority})...")
