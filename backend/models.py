@@ -17,13 +17,19 @@ class Job:
 
         self.status = "pending"
 
+        self._logs = []
+
+    def add_log(self, message: str) -> None:
+        self._logs.append(message)
+
+    def get_logs(self):
+        return list(self._logs)
 
     def execute(self) -> None:
 
         """Must be overridden by subclasses."""
 
         raise NotImplementedError("Each job must implement its own execution logic.")
-
 
     def mark_done(self) -> None:
 
@@ -50,8 +56,12 @@ class EmailJob(Job):
 
 
     def execute(self) -> None:
+        
+        self.add_log(f"Email job {self.job_id} started")
 
         print(f"Sending email to {self.recipient}...")
+
+        self.add_log(f"Email job {self.job_id} completed")
 
         # FIX (models.py): removed self.mark_done() here.
         # Previously mark_done() set job.status="completed" inside execute(),
@@ -74,7 +84,11 @@ class DataProcessingJob(Job):
 
     def execute(self) -> None:
 
+        self.add_log(f"Data job {self.job_id} started")
+
         print(f"Processing dataset {self.dataset}...")
+
+        self.add_log(f"Data job {self.job_id} completed")
 
         # FIX (models.py): removed self.mark_done() here — same reason as EmailJob above.
 
@@ -86,4 +100,9 @@ class PriorityJob(Job):
         self.priority = priority
 
     def execute(self) -> None:
+
+        self.add_log(f"Priority job {self.job_id} started")
+
         print(f"Executing priority job: {self.description} (priority={self.priority})...")
+
+        self.add_log(f"Priority job {self.job_id} completed")
