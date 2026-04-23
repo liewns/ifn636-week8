@@ -4,6 +4,7 @@ Defines the Job hierarchy (parent + child classes).
 Polymorphism: each subclass implements its own execute().
 """
 
+import time
 
 class Job:
 
@@ -12,18 +13,31 @@ class Job:
     def __init__(self, job_id: int, description: str) -> None:
 
         self.job_id = job_id
-
         self.description = description
-
         self.status = "pending"
-
         self._logs = []
+        self._start_time = None
+        self._end_time = None
 
     def add_log(self, message: str) -> None:
         self._logs.append(message)
 
     def get_logs(self):
         return list(self._logs)
+    
+    def start(self) -> None:
+        self._start_time = time.time()
+        self.add_log(f"Job {self.job_id} started")
+
+    def end(self) -> None:
+        self._end_time = time.time()
+        self.add_log(f"Job {self.job_id} ended")
+        self.add_log(f"Duration: {self.get_duration():.4} seconds")
+
+    def get_duration(self) -> float:
+        if self._start_time is not None and self._end_time is not None:
+            return self._end_time - self._start_time
+        return 0.0
 
     def execute(self) -> None:
 
@@ -57,11 +71,11 @@ class EmailJob(Job):
 
     def execute(self) -> None:
         
+        self.start()
         self.add_log(f"Email job {self.job_id} started")
-
         print(f"Sending email to {self.recipient}...")
-
         self.add_log(f"Email job {self.job_id} completed")
+        self.end()
 
         # FIX (models.py): removed self.mark_done() here.
         # Previously mark_done() set job.status="completed" inside execute(),
@@ -84,11 +98,11 @@ class DataProcessingJob(Job):
 
     def execute(self) -> None:
 
+        self.start()
         self.add_log(f"Data job {self.job_id} started")
-
         print(f"Processing dataset {self.dataset}...")
-
         self.add_log(f"Data job {self.job_id} completed")
+        self.end()
 
         # FIX (models.py): removed self.mark_done() here — same reason as EmailJob above.
 
@@ -100,12 +114,11 @@ class PriorityJob(Job):
         self.priority = priority
 
     def execute(self) -> None:
-
+        self.start()
         self.add_log(f"Priority job {self.job_id} started")
-
         print(f"Executing priority job: {self.description} (priority={self.priority})...")
-
         self.add_log(f"Priority job {self.job_id} completed")
+        self.end()
 
 class JobFactory:
     @staticmethod
